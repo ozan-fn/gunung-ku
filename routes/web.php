@@ -26,7 +26,10 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resource('gunung', GunungController::class);
-Route::resource('basecamp', BasecampController::class);
+Route::middleware('auth')->group(function () {
+    Route::resource('gunung', GunungController::class);
+    Route::resource('basecamp', BasecampController::class);
+    Route::delete('/basecamp/photo/{id}', [BasecampController::class, 'deletePhoto'])->name('basecamp.photo.delete');
+});
 
 require __DIR__ . '/auth.php';

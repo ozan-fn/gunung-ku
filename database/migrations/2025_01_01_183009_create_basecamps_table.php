@@ -14,15 +14,14 @@ return new class extends Migration
         Schema::create('basecamps', function (Blueprint $table) {
             $table->id();
             $table->foreignId('gunung_id')->constrained('gunungs')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete()->unique();
             $table->string('nama');
-            $table->text('alamat');
-            $table->decimal('harga', 10, 2);
-            $table->text('deskripsi');
-            $table->integer('kuota');
-            $table->string('telepon');
-            $table->decimal('latitude', 10, 8);
-            $table->decimal('longitude', 11, 8);
+            $table->text('alamat')->nullable();
+            $table->decimal('harga', 10, 2)->nullable();
+            $table->text('deskripsi')->nullable();
+            $table->integer('kuota')->nullable();
+            $table->string('telepon')->nullable();
+            $table->string('gmaps_link')->nullable();
             $table->timestamps();
         });
     }

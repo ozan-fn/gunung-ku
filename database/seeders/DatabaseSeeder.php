@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Basecamp;
+use App\Models\Gunung;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -24,12 +26,29 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
         ]);
 
-        $user = User::firstOrCreate(['email' => 'ozan6825@gmail.com'], [
-            'name' => 'Akhmad Fauzan',
-            'email' => 'ozan6825@gmail.com',
-            'password' => bcrypt('Akhmad6825'),
+        $user1 = User::create([
+            'name' => 'Admin Test',
+            'email' => 'admin@mail.com',
+            'password' => bcrypt('12345678'),
         ]);
 
-        $user->assignRole('Admin');
+        $user2 = User::create([
+            'name' => 'User Test',
+            'email' => 'user@mail.com',
+            'password' => bcrypt('12345678'),
+        ]);
+
+        $user3 = User::create([
+            'name' => 'Superadmin Test',
+            'email' => 'superadmin@mail.com',
+            'password' => bcrypt('12345678'),
+        ]);
+
+        $user1->syncRoles('admin');
+        $user2->syncRoles('user');
+        $user3->syncRoles('superadmin');
+
+        Gunung::factory()->count(1)->create();
+        Basecamp::factory()->count(1)->create();
     }
 }

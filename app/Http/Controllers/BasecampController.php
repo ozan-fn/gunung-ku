@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Basecamp;
+use App\Models\BasecampPhoto;
+use Faker\Provider\Base;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class BasecampController extends Controller
@@ -13,7 +17,15 @@ class BasecampController extends Controller
      */
     public function index()
     {
-        return Inertia::render('Basecamp/Index');
+        $user = Auth::user();
+        $basecamp = Basecamp::with('photos')->where('user_id', $user->id)->first();
+        if ($basecamp) {
+            $basecamp->photos->map(function ($photo) {
+                $photo->path = Storage::url($photo->path);
+                return $photo;
+            });
+        }
+        return Inertia::render('Basecamp/Index', compact(['basecamp']));
     }
 
     /**
@@ -21,7 +33,8 @@ class BasecampController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Basecamp/Index');
+
+        //
     }
 
     /**
@@ -53,14 +66,58 @@ class BasecampController extends Controller
      */
     public function update(Request $request, Basecamp $basecamp)
     {
-        //
+        if ($request->hasFile('photo')) {
+            $request->validate([
+                'photo' => 'required|image',
+            ]);
+
+            $path = $request->file('photo')->store('basecamp');
+
+            BasecampPhoto::create([
+                'basecamp_id' => $basecamp->id,
+                'path' => $path
+            ]);
+
+            return redirect()->back();
+        }
+
+        $request->validate([
+            'nama' => 'required',
+            'alamat' => 'required',
+            'harga' => 'required|numeric',
+            'deskripsi' => 'required',
+            'kuota' => 'required|numeric',
+            'telepon' => 'required',
+            'gmaps_link' => 'required|url'
+        ]);
+
+        $basecamp->update([
+            'nama' => $request->nama,
+            'alamat' => $request->alamat,
+            'harga' => $request->harga,
+            'deskripsi' => $request->deskripsi,
+            'kuota' => $request->kuota,
+            'telepon' => $request->telepon,
+            'gmaps_link' => $request->gmaps_link
+        ]);
+
+        return redirect()->back();
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Basecamp $basecamp)
+    public function destroy()
     {
         //
+    }
+
+    public function deletePhoto($id)
+    {
+        $photo = BasecampPhoto::find($id);
+        Storage::delete($photo->path);
+        $photo->delete();
+
+        return redirect()->back();
     }
 }

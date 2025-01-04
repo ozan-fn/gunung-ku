@@ -8,6 +8,10 @@ import { PropsWithChildren, ReactNode, useState } from "react";
 export default function Authenticated({ header, children }: PropsWithChildren<{ header?: ReactNode }>) {
     const user = usePage().props.auth.user;
 
+    const hasRole = (role: "user" | "admin" | "superadmin") => {
+        return user.roles.includes(role);
+    };
+
     const [showingNavigationDropdown, setShowingNavigationDropdown] = useState(false);
 
     return (
@@ -27,13 +31,17 @@ export default function Authenticated({ header, children }: PropsWithChildren<{ 
                                     Dashboard
                                 </NavLink>
 
-                                <NavLink href={route("gunung.index")} active={route().current("gunung.index")}>
-                                    Gunung
-                                </NavLink>
+                                {hasRole("superadmin") && (
+                                    <NavLink href={route("gunung.index")} active={route().current("gunung.index")}>
+                                        Gunung
+                                    </NavLink>
+                                )}
 
-                                <NavLink href={route("basecamp.index")} active={route().current("basecamp.index")}>
-                                    Basecamp
-                                </NavLink>
+                                {hasRole("admin") && (
+                                    <NavLink href={route("basecamp.index")} active={route().current("basecamp.index")}>
+                                        Basecamp
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 

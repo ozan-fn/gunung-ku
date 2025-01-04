@@ -48,4 +48,9 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function basecamps()
+    {
+        return $this->hasMany(Basecamp::class, 'user_id');
+    }
 }
